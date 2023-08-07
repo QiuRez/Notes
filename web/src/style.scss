@@ -95,6 +95,29 @@ header {
 				}
 			}
 		}
+
+		.hello {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			width: 400px;
+			gap: 7px;
+
+			button {
+				font-family: 'Inter';
+				font-size: 17px;
+				position: relative;
+				padding: 7px 15px;
+				background-color: #c55c5c4e;
+				border-radius: 25px;
+				transition: .5s all;
+				
+				&:hover {
+					background-color: #C55C5C;
+				}
+			}
+		}
 	}
 }
 

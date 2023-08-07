@@ -56,7 +56,7 @@
 
 					} else {
 
-						http_response_code(400);
+						http_response_code(401);
 						echo json_encode(array("message" => "Пользователь с таким Email уже существует"));
 					}
 

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookielib": "^1.1.1",
     "express": "^4.18.2",
     "jquery": "^3.7.0",
     "package.json": "^0.0.0",

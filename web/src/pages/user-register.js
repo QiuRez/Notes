@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import $, { error } from 'jquery'
 import Header from "../components/header";
 import Footer from '../components/footer';
+import {setCookie} from '../components/functions/cookies'
 
 
 export default class UserRegister extends Component {
@@ -86,10 +87,6 @@ export default class UserRegister extends Component {
 			this.state.checkEmail == true &&
 			this.state.inputLogin.length > 0
 		) {
-
-			const userLogin = this.state.inputLogin;
-			
-
 			$.ajax({
 				method: 'POST',
 				data: this.state,
@@ -99,9 +96,14 @@ export default class UserRegister extends Component {
 						console.log('Пользователь с таким логином уже существует');
 					}
 				},
+				statusCode: {
+					401: function() {
+						console.log('Пользователь с таким Email уже существует');
+					}
+				},
 				success: this.regiserSuccess(),
 				error: function(data) {
-					console.log(data);
+					console.log(data);;
 				}
 			})
 
@@ -113,7 +115,7 @@ export default class UserRegister extends Component {
 
 		const userLogin = this.state.inputLogin;
 
-		localStorage.setItem('user', userLogin)
+		setCookie('user', userLogin);
 
 		window.location.href = '/'
 
