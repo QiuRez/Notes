@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import $, { error } from 'jquery';
+import $, { data, error } from 'jquery';
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { render } from "react-dom";
+import { setCookie } from "../components/functions/cookies";
 
 
 export default class UserAuth extends Component {
@@ -14,6 +15,8 @@ export default class UserAuth extends Component {
 	}
 
 
+	// ПРОВЕРКА ВАЛИДАЦИИ ДАННЫХ
+
 	ValidationEmail = email => {
 		const regex = /^\S+@\S+\.\S+$/;
 		
@@ -21,6 +24,7 @@ export default class UserAuth extends Component {
 
 		return false
 	}
+
 
 	handlerInput = event => {
 		
@@ -44,9 +48,11 @@ export default class UserAuth extends Component {
 
 	}
 
+
+	// ЗАПРОС НА СЕРВЕР
+
 	buttonHandler = event => {
 		event.preventDefault();
-		console.log(this.state);
 		if (
 			this.state.formEmail == true &&
 			this.state.inputPassword.length > 0
@@ -57,7 +63,9 @@ export default class UserAuth extends Component {
 				url: 'http://project/api/user/auth.php',
 				data: this.state,
 				success: function(data) {
-					console.log(data['login']);
+					setCookie('user', data['login']);
+					setCookie('user-hash', data['login_hash'])
+					window.location.href = '/';
 				},
 				statusCode: {
 					400: function(data) {
@@ -66,10 +74,11 @@ export default class UserAuth extends Component {
 				},
 				error: function(data) {
 					console.log("Пароль неверный");
-				}
-			})
+				},
+			});
 		}
 	}
+
 
 
 

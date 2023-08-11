@@ -17,6 +17,9 @@ export default class UserRegister extends Component {
 	}
 
 
+	// Проверка данных на валидацию
+
+
 	ValidationEmail = event => {
 		const regex = /^\S+@\S+\.\S+$/;
 		
@@ -80,6 +83,9 @@ export default class UserRegister extends Component {
 	}
 
 	
+	// Отправка данных на сервер
+
+
 	handleButton = event => {
 		event.preventDefault();
 		if (
@@ -93,36 +99,23 @@ export default class UserRegister extends Component {
 				url: 'http://project/api/user/register.php',
 				statusCode: {
 					400: function() {
-						console.log('Пользователь с таким логином уже существует');
-					}
-				},
-				statusCode: {
+						alert('Пользователь с таким логином уже существует.');
+					},
 					401: function() {
-						console.log('Пользователь с таким Email уже существует');
+						alert('Пользователь с такой почтой уже существует.');
 					}
 				},
-				success: this.regiserSuccess(),
+				success: function(data) {
+					setCookie('user-hash', data['login-hash']);
+					setCookie('user', data['login']);
+					window.location.href = '/'
+				},
 				error: function(data) {
-					console.log(data);;
+					// console.log(data);
 				}
 			})
-
 		}
 	}
-
-
-	regiserSuccess = _ => {
-
-		const userLogin = this.state.inputLogin;
-
-		setCookie('user', userLogin);
-
-		window.location.href = '/'
-
-
-	}
-	
-
 
 
 	render() {

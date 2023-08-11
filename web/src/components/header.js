@@ -2,20 +2,26 @@ import React, { Component, useState } from "react";
 import { Link } from 'react-router-dom';
 import logo from '../../public/images/icon/logo.svg'
 import logo_text from '../../public/images/icon/logo-text.svg'
-import { getCookie, removeCookie, setCookie } from '../components/functions/cookies'
+import { getCookie, removeCookie } from '../components/functions/cookies'
+import { AES } from "crypto-js";
 
 
 export default class Header extends Component {
 
 	state = {
-		user: getCookie('user') ?? null,
+		username: getCookie('user') ?? null,
 		logIn: getCookie('user') ? true : false,
 	}
 
+	// Кнопка выхода из аккаунта
+
 	logOutButton() {
 		removeCookie('user');
+		removeCookie('user-hash');
 		window.location.href = '/'
 	}
+
+	// Рендер по условию. Если пользователь авторизован/Если нет
 
 	CheckLogged = _ => {
 		if (this.state.logIn == false) {
@@ -28,7 +34,7 @@ export default class Header extends Component {
 		} else {
 			return(
 				<div className="hello">
-					<p>Рады вас видеть! {this.state.user}</p>
+					<p>Рады вас видеть! {this.state.username}</p>
 					<button className="logout-button" onClick={this.logOutButton}>Выйти</button>
 				</div>
 			)

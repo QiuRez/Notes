@@ -4,7 +4,10 @@
 
 		private $id;
 		public $login;
+		public $login_hash;
+		public $lowerLogin;
 		public $email;
+		public $lowerEmail;
 		public $password;
 		public $hash;
 
@@ -19,11 +22,11 @@
 
 			$query = "SELECT
 				id FROM " . $this->table_name . "
-				WHERE login=:login";
+				WHERE LOWER(login)=:login";
 
 			$stmt = $this->conn->prepare($query);
 
-			$stmt->bindParam(':login', $this->login);
+			$stmt->bindParam(':login', $this->lowerLogin);
 
 			$stmt->execute(); 
 
@@ -31,34 +34,36 @@
 
 				$query = "SELECT
 					id FROM " . $this->table_name . " 
-					WHERE email=:email";
+					WHERE LOWER(email)=:email";
 				
-					$stmt = $this->conn->prepare();
-					$stmt->bindParam(':email', $this->email);
+				$stmt = $this->conn->prepare($query);
+				$stmt->bindParam(':email', $this->lowerEmail);
+				$stmt->execute();
+
+				if ($stmt->rowCount() == 0) {
+
+					$query = "INSERT INTO " . $this->table_name . " (login, login_hash, email, hash) VALUES (:login, :login_hash, :email, :hash)";
+	
+					$this->login.strip_tags(htmlspecialchars($this->login));
+	
+					$stmt = $this->conn->prepare($query);
+
+	
+					$stmt->bindParam(":login", $this->login);
+					$stmt->bindParam(":login_hash", $this->login_hash);
+					$stmt->bindParam(":email", $this->email);
+					$stmt->bindParam(":hash", $this->hash);
+	
 					$stmt->execute();
+	
+					http_response_code(200);
+					echo json_encode(array("message" => "Пользователь зарегистрирован", 'login-hash'=>$this->login_hash, 'login'=>$this->login));
 
-					if ($stmt->rowCount() == 0) {
+				} else {
 
-						$query = "INSERT INTO " . $this->table_name . " (login, email, hash) VALUES (:login, :email, :hash)";
-		
-						$this->login.strip_tags(htmlspecialchars($this->login));
-		
-						$stmt = $this->conn->prepare($query);
-		
-						$stmt->bindParam(":login", $this->login);
-						$stmt->bindParam(":email", $this->email);
-						$stmt->bindParam(":hash", $this->hash);
-		
-						$stmt->execute();
-		
-						http_response_code(200);
-						echo json_encode(array("message" => "Пользователь зарегистрирован"));
-
-					} else {
-
-						http_response_code(401);
-						echo json_encode(array("message" => "Пользователь с таким Email уже существует"));
-					}
+					http_response_code(401);
+					echo json_encode(array("message" => "Пользователь с таким Email уже существует"));
+				}
 
 
 			} else {
@@ -71,7 +76,7 @@
 		function auth() {
 
 			$query = "SELECT
-				login, email, hash FROM " . $this->table_name . " 
+				login, email, hash, login_hash FROM " . $this->table_name . " 
 				WHERE email =:email";
 
 			$stmt = $this->conn->prepare($query);
@@ -91,7 +96,8 @@
 					http_response_code(200);
 					echo json_encode(array(
 									"Status"=>'Успех',
-									"login"=>$row["login"]
+									"login"=>$row["login"],
+									"login_hash"=>$row["login_hash"],
 					));
 				} else {
 

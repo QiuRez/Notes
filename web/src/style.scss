@@ -171,7 +171,7 @@ footer {
 	gap: 40px;
 
 	.note {
-		max-width: 380px;
+		width: 380px;
 		background-color: #2DC9AD;
 		border-radius: 45px;
 		padding: 18px 42px 10px 42px;
@@ -192,6 +192,7 @@ footer {
 		}
 
 		.note-content {
+			height: 133px;
 			
 			p {
 				overflow: hidden;
@@ -242,6 +243,47 @@ footer {
 
 	}
 }
+
+
+// Загрузка заметок
+
+
+
+.loading-notes, .not-create-note, .user-not-auth {
+	grid-area: 1/2/1/4;
+	width: 100%;
+	text-align: center;
+}
+
+.not-create-note, .user-not-auth {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+
+	button {
+		font-family: 'Inter';
+		background-color: #69cbe9;
+		padding: 10px 13px;
+		font-size: 14px;
+		border-radius: 25px;
+
+
+		&:hover {
+			background-color: #75defe;
+		}
+	}
+}
+
+.user-not-auth {
+	.reg_or_logIn {
+		display: flex;
+		gap: 50px;
+	}
+}
+
+
+
 
 // Регистрация и аунтефикация
 
