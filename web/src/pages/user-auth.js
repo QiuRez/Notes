@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import $, { data, error } from 'jquery';
-import Header from "../components/header";
-import Footer from "../components/footer";
-import { render } from "react-dom";
+import $ from 'jquery';
 import { setCookie } from "../components/functions/cookies";
 
 
@@ -26,22 +23,21 @@ export default class UserAuth extends Component {
 	}
 
 
-	handlerInput = event => {
-		
-		if (event.target.name == 'inputEmail' && event.target.value.length > 0) {
-			if (this.ValidationEmail(event.target.value)) {
+	handlerInput = ({target} = event) => {
+		if (target.name == 'inputEmail' && target.value.length > 0) {
+			if (this.ValidationEmail(target.value)) {
 				this.setState({
-					inputEmail: event.target.value,
+					inputEmail: target.value,
 					formEmail: true
 				})
-				event.target.style.outline = 'none';
+				target.style.outline = 'none';
 			} else {
-				event.target.style.outline = '2px solid red';
+				target.style.outline = '2px solid red';
 			}
-		} if(event.target.name == 'inputPassword') {
+		} if(target.name == 'inputPassword') {
 
 			this.setState({
-				inputPassword: event.target.value
+				inputPassword: target.value
 			})
 
 		}
@@ -63,8 +59,7 @@ export default class UserAuth extends Component {
 				url: 'http://project/api/user/auth.php',
 				data: this.state,
 				success: function(data) {
-					setCookie('user', data['login']);
-					setCookie('user-hash', data['login_hash'])
+					setCookie('username', data['username']);
 					window.location.href = '/';
 				},
 				statusCode: {
@@ -83,31 +78,24 @@ export default class UserAuth extends Component {
 
 
 	render() {
-
 		return(
 			<>
-				<Header />
-				<main>
-	
-					<div className="auth auth-block">
-						<h2>Вход</h2>
-						<form action="" method="post">
-							<div className="login">
-								<p>Почта: </p>
-								<input type="text" name="inputEmail" id="" placeholder="Email" onChange={this.handlerInput} />
-							</div>
-							
-							
-							<div className="repeat_password">
-								<p>Пароль: </p>
-								<input type="password" name="inputPassword" id="" placeholder="Пароль" onChange={this.handlerInput}/>
-							</div>
-							<button className="auth-button" onClick={this.buttonHandler}>Войти</button>
-						</form>
-					</div>
-	
-				</main>
-				<Footer />
+				<div className="auth auth-block">
+					<h2>Вход</h2>
+					<form action="" method="post">
+						<div className="login">
+							<p>Почта: </p>
+							<input type="text" name="inputEmail" id="" placeholder="Email" onChange={this.handlerInput} />
+						</div>
+						
+						
+						<div className="repeat_password">
+							<p>Пароль: </p>
+							<input type="password" name="inputPassword" id="" placeholder="Пароль" onChange={this.handlerInput}/>
+						</div>
+						<button className="auth-button" onClick={this.buttonHandler}>Войти</button>
+					</form>
+				</div>
 			</>
 		)
 

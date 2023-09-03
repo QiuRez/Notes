@@ -1,32 +1,27 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Routes, Link, resolvePath } from 'react-router-dom'
-import $ from "jquery";
-import logo from '../../public/images/icon/logo.svg'
-import Header from "../components/header";
-import Footer from "../components/footer";
+import React, { useEffect, useState } from "react";
+import { Link } from 'react-router-dom'
 import { getCookie } from "../components/functions/cookies";
+import { NoteDelete } from "../components/notedelete";
 
 
 export default function Main() {
 
-	const [ user, setUser ] = useState(getCookie('user') ?? null);
-	const [ userHash, setUserHash ] = useState(getCookie('user-hash') ?? null)
+	const [ username, setUsername ] = useState(getCookie('username') ?? null);
 	const [ note, setNote ] = useState(null);
 	const [ APISignal, setAPISignal ] = useState();
 	const [ emptyNotes, setEmptyNotes ] = useState();
 
+	// Получение заметок из БД
+
 	useEffect(() => {
 		getNotes();
-	}, [])
-
-
-	// Получение заметок из БД
+	}, []);
 
 	const getNotes = function () {
 		
-		if (userHash != null) {
+		if (username != null) {
 	
-			const apiURL = `http://project/api/notes/readAll.php?user-hash=${userHash}`;
+			const apiURL = `http://project/api/notes/readAll.php?username=${username}`;
 			
 			const notes = fetch(apiURL)
 			.then((response) => {
@@ -54,7 +49,44 @@ export default function Main() {
 		}
 	}
 
+	// Удаление заметок
+
+	const deleteNote = note_id => {
+		if (NoteDelete(note_id)) {
+			getNotes();
+		}
+	}
+
 	// Рендер заметок и разных ситуаций
+
+	const LoadingNotes = _ => (
+		<div className="loading-notes">
+			<h2>Загрузка...</h2>
+		</div>
+	);
+
+	const UserNotAuth = _ => (
+		<div className="user-not-auth">
+			<h2>Для просмотра и создания заметок <br /> нужно войти в аккаунт</h2>
+			<div className="reg_or_logIn">
+				<Link to='/register'><button>Зарегистрироваться</button></Link>
+				<Link to='/auth'><button>Войти</button></Link>
+			</div>
+		</div>
+	);
+
+	const NotCreateNote = _ => (
+		<div className="not-create-note">
+			<h2>Нет созданных заметок</h2>
+			<button>Создать первую заметку</button>
+		</div>
+	);
+
+	const ApiFailed = _ => (
+		<div className="api-failed">
+			<h2>Нет подключения с сервером :(</h2>
+		</div>
+	);
 
 	const RenderNotes = function() {
 
@@ -82,74 +114,35 @@ export default function Main() {
 							</div>
 						</div>
 						<div className="note-delete">
-							<button id="note-delete"></button>
+							<button id="note-delete" 
+							onClick={() => deleteNote(note.note_id)}></button>
 						</div>
 					</div>
 				</div>
 			))
 
 			return html;
+
 		} else {
 
-			if (APISignal == false) {
-				return (
-					<div className="loading-notes">
-						<h2>Нет подключения с сервером :(</h2>
-					</div>
-				)
-			} 
+			if (APISignal == false) { return <ApiFailed /> }; // Нет соединения с API
 
-			if (emptyNotes) {
-				return(
-					<div className="not-create-note">
-						<h2>Нет созданных заметок</h2>
-						<button>Создать первую заметку</button>
-					</div>
-				)
-			}
+			if (emptyNotes) { return <NotCreateNote /> };     // Нет созданных заметок
 
-			if (user == null) {
-				return(
-					<div className="user-not-auth">
-					<h2>Для просмотра и создания заметок <br /> нужно войти в аккаунт</h2>
-					<div className="reg_or_logIn">
-						<Link to='/register'><button>Зарегистрироваться</button></Link>
-						<Link to='/auth'><button>Войти</button></Link>
-					</div>
-				</div>
-				)
-			}
+			if (username == null) { return <UserNotAuth /> }; // Пользователь не авторизован
 
-			return (
-				<div className="loading-notes">
-					<h2>Загрузка...</h2>
-				</div>
-			)
-
-
+			return <LoadingNotes />;                          // Загрузка страницы, выполняется запрос к API
 		}
-
-
-		
-
-
 	}
+	
+
+
 
 	return(
 		<>
-
-			<Header />
-
-			<main>
-
 			<div className="main">
 				<RenderNotes />
 			</div>
-
-			</main>
-
-			<Footer />
-
 
 		</>
 

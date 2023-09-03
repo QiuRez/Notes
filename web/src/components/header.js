@@ -1,24 +1,25 @@
-import React, { Component, useState } from "react";
+import React, { Component, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import logo from '../../public/images/icon/logo.svg'
 import logo_text from '../../public/images/icon/logo-text.svg'
 import { getCookie, removeCookie } from '../components/functions/cookies'
-import { AES } from "crypto-js";
+import $ from 'jquery';
 
 
 export default class Header extends Component {
 
 	state = {
-		username: getCookie('user') ?? null,
-		logIn: getCookie('user') ? true : false,
+		username: getCookie('username') ?? null,
+		logIn: getCookie('username') ? true : false,
 	}
 
 	// Кнопка выхода из аккаунта
 
 	logOutButton() {
 		removeCookie('user');
-		removeCookie('user-hash');
-		window.location.href = '/'
+		useEffect(this.CheckLogged());
+
+		// window.location.href = '/';
 	}
 
 	// Рендер по условию. Если пользователь авторизован/Если нет

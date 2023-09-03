@@ -12,7 +12,7 @@
 
 	$note = new Note($db);
 
-	$note->userHash = $_GET['user-hash'];
+	$note->username = $_GET['username'];
 
 	$note->readAll();
 

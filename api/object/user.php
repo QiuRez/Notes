@@ -3,8 +3,7 @@
 	class User {
 
 		private $id;
-		public $login;
-		public $login_hash;
+		public $username;
 		public $lowerLogin;
 		public $email;
 		public $lowerEmail;
@@ -42,22 +41,21 @@
 
 				if ($stmt->rowCount() == 0) {
 
-					$query = "INSERT INTO " . $this->table_name . " (login, login_hash, email, hash) VALUES (:login, :login_hash, :email, :hash)";
+					$query = "INSERT INTO " . $this->table_name . " (login, email, hash) VALUES (:login, :email, :hash)";
 	
-					$this->login.strip_tags(htmlspecialchars($this->login));
+					$this->username.strip_tags(htmlspecialchars($this->username));
 	
 					$stmt = $this->conn->prepare($query);
 
 	
-					$stmt->bindParam(":login", $this->login);
-					$stmt->bindParam(":login_hash", $this->login_hash);
+					$stmt->bindParam(":login", $this->username);
 					$stmt->bindParam(":email", $this->email);
 					$stmt->bindParam(":hash", $this->hash);
 	
 					$stmt->execute();
 	
 					http_response_code(200);
-					echo json_encode(array("message" => "Пользователь зарегистрирован", 'login-hash'=>$this->login_hash, 'login'=>$this->login));
+					echo json_encode(array("message" => "Пользователь зарегистрирован", 'username'=>$this->username));
 
 				} else {
 
@@ -76,7 +74,7 @@
 		function auth() {
 
 			$query = "SELECT
-				login, email, hash, login_hash FROM " . $this->table_name . " 
+				username, email, hash FROM " . $this->table_name . " 
 				WHERE email =:email";
 
 			$stmt = $this->conn->prepare($query);
@@ -96,8 +94,7 @@
 					http_response_code(200);
 					echo json_encode(array(
 									"Status"=>'Успех',
-									"login"=>$row["login"],
-									"login_hash"=>$row["login_hash"],
+									"username"=>$row["username"],
 					));
 				} else {
 

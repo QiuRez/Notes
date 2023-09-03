@@ -1,8 +1,5 @@
-import React, { useState, Component } from "react";
-import ReactDOM from "react-dom";
-import $, { error } from 'jquery'
-import Header from "../components/header";
-import Footer from '../components/footer';
+import React, { Component } from "react";
+import $ from 'jquery'
 import {setCookie} from '../components/functions/cookies'
 
 
@@ -20,66 +17,67 @@ export default class UserRegister extends Component {
 	// Проверка данных на валидацию
 
 
-	ValidationEmail = event => {
+	ValidationEmail = ({target = event}) => {
 		const regex = /^\S+@\S+\.\S+$/;
-		
-		if (regex.test(event.target.value)) { return true }
+
+		if (regex.test(target.value)) { return true }
 
 		return false
 	}
 
 
-	handleInput = event => {
-		if (event.target.value.length > 0 && event.target.name !== 'inputEmail') {
+	handleInput = ({target} = event) => {
+		if (target.value.length > 0 && target.name !== 'inputEmail') {
+			if (target.name == 'inputLogin' && target.value.length < 37) {
 
-			if (event.target.name == 'inputLogin' && event.target.value.length < 37) {
+				target.style.outline = 'none'
 
-				event.target.style.outline = 'none'
-
-				this.setState({
-					[event.target.name]: event.target.value
-				});
+				this.setState({[ target.name ]: target.value});
 
 			} else {
 
-				if (event.target.name !== 'inputPassword') {
-					event.target.style.outline = '2px solid red'
+				if (target.name !== 'inputPassword') {
+					target.style.outline = '2px solid red'
 				}
 
 			}
 
 		}
 
-		if (event.target.value.length > 0 && event.target.name == 'inputEmail') {
+		if (target.value.length > 0 && target.name == 'inputEmail') {
 
 			if(this.ValidationEmail(event)) {
-				event.target.style.outline = 'none';
+				target.style.outline = 'none';
 				this.setState({
-					[event.target.name]: event.target.value,
+					[target.name]: target.value,
 					checkEmail: true
 				})
 			} else {
 				this.setState({ checkEmail: false })
-				event.target.style.outline = '2px solid red';
+				target.style.outline = '2px solid red';
 			}
 		}
 
-		if (event.target.value.length > 0 && event.target.name == 'inputPassword') {
+		if (target.value.length > 0 && target.name == 'inputPassword') {
 			this.setState({
-				inputPassword: event.target.value
+				inputPassword: target.value
 			})
 		}
 	}
 
-	checkPassword = event => {
-		if (event.target.value == this.state.inputPassword) {
+	checkPassword = ({target} = event) => {
+		if (target.value == this.state.inputPassword) {
 			this.setState({
 				checkPassword: true
 			});
-			event.target.style.outline = 'none';
+			target.style.outline = 'none';
 		} else {
-			event.target.style.outline = '2px solid red';
+			target.style.outline = '2px solid red';
 		}
+
+
+		
+		
 	}
 
 	
@@ -97,6 +95,7 @@ export default class UserRegister extends Component {
 				method: 'POST',
 				data: this.state,
 				url: 'http://project/api/user/register.php',
+				credentials: "same-origin",
 				statusCode: {
 					400: function() {
 						alert('Пользователь с таким логином уже существует.');
@@ -106,12 +105,22 @@ export default class UserRegister extends Component {
 					}
 				},
 				success: function(data) {
-					setCookie('user-hash', data['login-hash']);
-					setCookie('user', data['login']);
+					setCookie('username', data['login']);
 					window.location.href = '/'
 				},
-				error: function(data) {
-					// console.log(data);
+				error: function(error) {
+					// console.log(error);
+				}
+			})
+			$.ajax({
+				method: 'POST',
+				data: this.state,
+				url: 'http://project/api/session/getSession.php',
+				success: function(data) {
+					console.log(data);
+				},
+				error: function(error) {
+					console.log(error);
 				}
 			})
 		}
@@ -122,36 +131,28 @@ export default class UserRegister extends Component {
 
 		return(
 			<>
-
-				<Header />
-					<main>
-
-						<div className="register auth-block">
-							<h2>Регистрация</h2>
-							<form action="">
-								<div className="login">
-									<p>Придумайте логин: </p>
-									<input type="text" name="inputLogin" id="" placeholder="Логин" onChange={this.handleInput}/>
-								</div>
-								<div className="email">
-									<p>Email:</p>
-									<input type="text" name="inputEmail" id="" placeholder="Email" onChange={this.handleInput}/>
-								</div>
-								<div className="password">
-									<p>Придумайте пароль:</p>
-									<input type="password" name="inputPassword" id="" placeholder="Пароль" onChange={this.handleInput}/>
-								</div>
-								<div className="repeat_password">
-									<p>Повторите пароль:</p>
-									<input type="password" name="inputCheckPassword" id="" placeholder="Повторите пароль" onChange={this.checkPassword}/>
-								</div>
-								<button onClick={this.handleButton}>Зарегистрироваться</button>
-							</form>
+				<div className="register auth-block">
+					<h2>Регистрация</h2>
+					<form action="">
+						<div className="login">
+							<p>Придумайте логин: </p>
+							<input type="text" name="inputLogin" id="" placeholder="Логин" onChange={this.handleInput}/>
 						</div>
-
-					</main>
-				<Footer />
-
+						<div className="email">
+							<p>Email:</p>
+							<input type="text" name="inputEmail" id="" placeholder="Email" onChange={this.handleInput}/>
+						</div>
+						<div className="password">
+							<p>Придумайте пароль:</p>
+							<input type="password" name="inputPassword" id="" placeholder="Пароль" onChange={this.handleInput}/>
+						</div>
+						<div className="repeat_password">
+							<p>Повторите пароль:</p>
+							<input type="password" name="inputCheckPassword" id="" placeholder="Повторите пароль" onChange={this.checkPassword}/>
+						</div>
+						<button onClick={this.handleButton}>Зарегистрироваться</button>
+					</form>
+				</div>
 			</>
 		)
 	}

@@ -8,9 +8,8 @@
 		private $table_name = 'notes';
 		public $conn;
 
-		public $userLogin;
-		public $userHash;
-
+		public $username;
+		public $note_id;
 		function __construct($db) {
 			$this->conn = $db;
 		}
@@ -18,16 +17,15 @@
 		function readAll() {
 
 			$query = "SELECT 
-				n.*, u.login_hash 
+				n.*, u.username
 			FROM notes n 
 			INNER JOIN users u 
-				on n.user_login = u.login 
-					WHERE u.login_hash =:login_hash";
+				on n.user_login = u.username
+					WHERE u.username =:username";
 
 			$stmt = $this->conn->prepare($query);
 			
-			// $stmt->bindParam(':user_login', $this->userLogin);
-			$stmt->bindParam(':login_hash', $this->userHash);
+			$stmt->bindParam(':username', $this->username);
 
 			$stmt->execute();
 
@@ -56,11 +54,29 @@
 				echo json_encode($notes_arr);
 
 			}
+		}
 
+		function delete() {
+		
+			$query = "DELETE
+			FROM notes 
+			WHERE note_id =:note_id
+			LIMIT 1";
 
+			$stmt = $this->conn->prepare($query);
+	
+			$stmt->bindParam(':note_id', $this->note_id);
+	
+			$res = $stmt->execute();
 
-
-			
+			if ($res) {
+				http_response_code(200);
+				echo json_encode(array("status" => "ok"));
+			} else {
+				http_response_code(400);
+				echo json_encode(array("status" => "not ok"));
+			}
+		
 		}
 
 		

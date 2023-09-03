@@ -2,6 +2,7 @@
 
 	header("Access-Control-Allow-Origin: *");
 	header("Content-Type: application/json; charset=UTF-8");
+	
 
 	require_once($_SERVER['DOCUMENT_ROOT'] . '/api/config/database.php');
 	require_once($_SERVER['DOCUMENT_ROOT'] . '/api/object/user.php');
@@ -27,10 +28,9 @@
 
 		$user->lowerLogin = mb_strtolower($inputLogin);
 		$user->lowerEmail = mb_strtolower($inputEmail);
-		$user->login = $inputLogin;
+		$user->username = $inputLogin;
 		$user->email = $inputEmail;
 		$user->hash = $hash;
-		$user->login_hash = $login_hash;
 
 		$user->register();
 	}
