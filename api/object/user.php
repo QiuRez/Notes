@@ -1,10 +1,9 @@
 <?php
-
 	class User {
 
 		private $id;
 		public $username;
-		public $lowerLogin;
+		public $lowerUsername;
 		public $email;
 		public $lowerEmail;
 		public $password;
@@ -21,11 +20,11 @@
 
 			$query = "SELECT
 				id FROM " . $this->table_name . "
-				WHERE LOWER(login)=:login";
+				WHERE LOWER(username)=:username";
 
 			$stmt = $this->conn->prepare($query);
 
-			$stmt->bindParam(':login', $this->lowerLogin);
+			$stmt->bindParam(':username', $this->lowerUsername);
 
 			$stmt->execute(); 
 
@@ -41,33 +40,39 @@
 
 				if ($stmt->rowCount() == 0) {
 
-					$query = "INSERT INTO " . $this->table_name . " (login, email, hash) VALUES (:login, :email, :hash)";
+					$query = "INSERT INTO " . $this->table_name . " (username, email, hash) VALUES (:username, :email, :hash)";
 	
 					$this->username.strip_tags(htmlspecialchars($this->username));
 	
 					$stmt = $this->conn->prepare($query);
 
 	
-					$stmt->bindParam(":login", $this->username);
+					$stmt->bindParam(":username", $this->username);
 					$stmt->bindParam(":email", $this->email);
 					$stmt->bindParam(":hash", $this->hash);
+
+					try {
+						$stmt->execute();
+						http_response_code(200);
+						echo json_encode(array("message" => "Пользователь зарегистрирован", 'username'=>$this->username));
+					} catch (PDOException $e) {
+						http_response_code(405);
+						echo json_encode(array('Error' => $e->getMessage()));
+					}
+
 	
-					$stmt->execute();
-	
-					http_response_code(200);
-					echo json_encode(array("message" => "Пользователь зарегистрирован", 'username'=>$this->username));
 
 				} else {
 
 					http_response_code(401);
-					echo json_encode(array("message" => "Пользователь с таким Email уже существует"));
+					echo json_encode(array("message" => "Пользователь с таким Email уже существует"), JSON_UNESCAPED_UNICODE);
 				}
 
 
 			} else {
 
 				http_response_code(400);
-				echo json_encode(array("message" => "Пользователь с таким логином уже существует"));
+				echo json_encode(array("message" => "Пользователь с таким логином уже существует"), JSON_UNESCAPED_UNICODE);
 			}
 		}
 

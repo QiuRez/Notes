@@ -8,7 +8,16 @@
 	box-sizing: border-box;
 }
 
-a, p, h1, h2, h3, h4, h5, h6 {
+a,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+label {
 	text-decoration: none;
 	font-family: 'Inter';
 }
@@ -38,31 +47,31 @@ body {
 
 
 header {
-	
+
 	.header__content {
 		padding: 20px;
 		display: flex;
 		justify-content: space-between;
-		
+
 		.logo {
 			display: flex;
 			align-items: center;
 			gap: 30px;
 		}
-		
+
 		.auth {
 			width: 300px;
 			display: flex;
 			align-items: center;
 			gap: 30px;
-			
+
 			a {
 				padding: 10px;
 				border-radius: 25px;
 				font-size: 17px;
 				color: black;
 				position: relative;
-				
+
 				&::before {
 					content: '';
 					position: absolute;
@@ -76,7 +85,7 @@ header {
 					transition: .5s all;
 					transform: rotateY(90deg);
 				}
-				
+
 				&::after {
 					content: '';
 					position: absolute;
@@ -89,7 +98,7 @@ header {
 					border-radius: 25px;
 					z-index: -1;
 				}
-				
+
 				&:hover::before {
 					transform: rotateY(0deg);
 				}
@@ -112,7 +121,7 @@ header {
 				background-color: #c55c5c4e;
 				border-radius: 25px;
 				transition: .5s all;
-				
+
 				&:hover {
 					background-color: #C55C5C;
 				}
@@ -140,8 +149,47 @@ main {
 footer {
 	flex-shrink: 0;
 	position: relative;
-	z-index: 0;
-	
+
+
+	button {
+		position: absolute;
+		top: -30px;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: #1285e4;
+		padding: 10px 20px 10px 40px;
+		font-size: 15px;
+		color: white;
+		z-index: 1;
+		font-weight: 500;
+
+		&::before {
+			content: '';
+			background-image: url('../public/images/icon/plus-large-svgrepo-com.svg');
+			background-size: 100%;
+			background-repeat: no-repeat;
+			display: block;
+			position: absolute;
+			height: 25px;
+			width: 25px;
+
+			top: 19%;
+			left: 10px;
+		}
+
+		&:hover {
+			background-color: #1595fe;
+		}
+
+	}
+
+	button[type=submit] {
+		position: relative;
+		transform: unset;
+		top: unset;
+		left: unset;
+	}
+
 	.created-by {
 		background-color: #f6efcf;
 		width: 198px;
@@ -182,7 +230,7 @@ footer {
 		z-index: 1;
 
 		.note-title {
-			
+
 			#note-title {
 				cursor: pointer;
 				text-align: center;
@@ -193,7 +241,7 @@ footer {
 
 		.note-content {
 			height: 133px;
-			
+
 			p {
 				overflow: hidden;
 				display: -webkit-box;
@@ -218,7 +266,7 @@ footer {
 				> div {
 					display: flex;
 					gap: 7px;
-					
+
 					> p {
 						text-align: right;
 						font-size: 14px;
@@ -232,6 +280,7 @@ footer {
 				width: 30px;
 				display: flex;
 				align-items: center;
+
 				button {
 					background-image: url('~assets/images/icon/trash.svg');
 					background-repeat: no-repeat;
@@ -241,6 +290,42 @@ footer {
 			}
 		}
 
+
+	}
+
+	.note.delete {
+		animation-name: flipOutX;
+		backface-visibility: visible !important;
+		animation-duration: 1s;
+		animation-fill-mode: both;
+	}
+
+	@-webkit-keyframes flipOutX {
+		0% {
+			-webkit-transform: perspective(400px);
+			transform: perspective(400px);
+			opacity: 1;
+		}
+
+		100% {
+			-webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+			transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+			opacity: 0;
+		}
+	}
+
+	@keyframes flipOutX {
+		0% {
+			-webkit-transform: perspective(400px);
+			transform: perspective(400px);
+			opacity: 1;
+		}
+
+		100% {
+			-webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+			transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+			opacity: 0;
+		}
 	}
 }
 
@@ -249,13 +334,17 @@ footer {
 
 
 
-.loading-notes, .not-create-note, .user-not-auth, .api-failed {
+.loading-notes,
+.not-create-note,
+.user-not-auth,
+.api-failed {
 	grid-area: 1/2/1/4;
 	width: 100%;
 	text-align: center;
 }
 
-.not-create-note, .user-not-auth {
+.not-create-note,
+.user-not-auth {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -344,7 +433,7 @@ footer {
 					padding-left: 15px;
 				}
 			}
-			
+
 		}
 
 		button {
@@ -373,7 +462,131 @@ footer {
 }
 
 
+// Модальные окна
+
+// Модальное окно для создание заметок
+.background-modal {
+	display: none;
+	position: fixed;
+	z-index: 5;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.400);
+	top: 0;
+	left: 0;
+	backdrop-filter: blur(5px);
+
+	.create-note {
+		position: relative;
+		display: flex;
+		background-color: white;
+		width: 40%;
+		height: 500px;
+		min-height: 500px;
+		position: absolute;
+		top: 44%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 6;
+		border-radius: 50px;
+		flex-direction: column;
+		align-items: center;
+		gap: 5%;
+		padding: 20px 0;
+		background-color: rgba(255, 255, 255, 0.5);
+
+		h2 {
+			font-weight: 600;
+		}
 
 
+		form {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			justify-content: space-around;
+			width: 80%;
+			height: 90%;
+
+			.text-info--color {
+				display: flex;
+				width: 100%;
+				justify-content: space-evenly;
+
+				.text-info {
+					padding: 20px 10px;
+					border-radius: 25px;
+					display: flex;
+					flex-direction: column;
+					gap: 30px;
+					width: 50%;
+
+					label {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						gap: 10px;
+						font-size: 17px;
+						font-weight: 500;
+
+						input {
+							width: 200px;
+							border: 1px solid rgba(0, 0, 0, 0.212);
+							height: 25px;
+							padding: 0 10px;
+							border-radius: 5px;
+
+							&:focus-visible {
+								outline: unset;
+								border: 1px solid rgba(0, 0, 0, 1);
+							}
+						}
+					}
 
 
+					textarea {
+						width: 90%;
+						resize: none;
+						height: 170px;
+						font-family: 'Inter';
+						font-size: 14px;
+						padding: 7px;
+						border-radius: 10px;
+						border: none;
+						border: 1px solid rgba(0, 0, 0, 0.212);
+
+						&:focus-visible {
+							outline: unset;
+							border: 1px solid rgba(0, 0, 0, 1);
+						}
+					}
+				}
+
+
+				.set-color {
+					width: 20%;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: space-between;
+
+					> .color {
+						width: 100%;
+						height: 25px;
+						cursor: pointer;
+					}
+				}
+			}
+
+
+		}
+
+		.modalClose {
+			position: absolute;
+			top: 25px;
+			right: 35px;
+			cursor: pointer;
+		}
+	}
+}

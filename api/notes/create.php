@@ -1,51 +1,32 @@
 <?php 
 
-	header("Allow-Control-Allow-Origin: *");
+	header('Access-Control-Allow-Origin: *');
 	header("Content-Type: application/json; charset=UTF-8");
-	header("Allow-Control-Allow-Methods: POST");
-	header("Access-Control-Max-Age: 3600");
-	header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-	require_once "../config/database.php";
-	require_once "../object/product.php";
+	require_once($_SERVER['DOCUMENT_ROOT'] . '/api/config/database.php');
+	require_once($_SERVER['DOCUMENT_ROOT'] . '/api/object/note.php');
+
 
 	// Инициализация базы данных
-	
 	$database = new Database();
 	$db = $database->getConnection();
 
-	// Инициализация продукта
+	// Инициализация заметок
+	$note = new Note($db); 
+	$stmt = $note->conn;
 
-	// $product = new Product($db);
+	$content = file_get_contents("php://input");
 
-	$data = json_decode(file_get_contents("php://input"));
+	extract($_POST);
 
-	if(
-		!empty($data->name) &&
-		!empty($data->price) &&
-		!empty($data->description) &&
-		!empty($data->created) &&
-		!empty($data->category_id)
-	) {
-		$product->name = $data-> name;
-		$product->price = $data->price;
-		$product->description = $data->description;
-		$product->category_id = $data->category_id;
-		$product->created = date("Y-m-d H:i:s");
+	
+	$note->username = htmlspecialchars(strip_tags($username));
+	$note->color = strip_tags($color);
+	$note->title = htmlspecialchars(strip_tags($title));
+	$note->content = htmlspecialchars(strip_tags($content));
 
-		if($product->create()) {
-			http_response_code(201);
+	$note->create();
 
-			echo json_encode(array("message"=>"Товар создан"), JSON_UNESCAPED_UNICODE);
-		} else {
-			http_response_code(503);
-
-			echo json_encode(array("message"=>"Ошибка при внесении"), JSON_UNESCAPED_UNICODE);
-		}
-	} else {
-		http_response_code(400);
-
-		echo json_encode(array("message"=>"Не все данные заполнены"), JSON_UNESCAPED_UNICODE);
-	}
+	
 
 ?>

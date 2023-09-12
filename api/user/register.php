@@ -24,11 +24,9 @@
 		
 		$hash = password_hash($inputPassword, PASSWORD_BCRYPT);
 
-		$login_hash = crypt($inputLogin, date('Y-m-d H:i:s'));  // Хеширование логина
-
-		$user->lowerLogin = mb_strtolower($inputLogin);
+		$user->lowerUsername = mb_strtolower($inputUsername);
 		$user->lowerEmail = mb_strtolower($inputEmail);
-		$user->username = $inputLogin;
+		$user->username = $inputUsername;
 		$user->email = $inputEmail;
 		$user->hash = $hash;
 

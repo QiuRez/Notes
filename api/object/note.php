@@ -4,12 +4,17 @@
 
 		public $id;
 		public $data;
-
-		private $table_name = 'notes';
-		public $conn;
-
 		public $username;
 		public $note_id;
+		public $title;
+		public $content;
+		public $color;
+		public $created_at;
+		private $table_name = 'notes';
+		public $conn;
+		
+		
+		
 		function __construct($db) {
 			$this->conn = $db;
 		}
@@ -20,7 +25,7 @@
 				n.*, u.username
 			FROM notes n 
 			INNER JOIN users u 
-				on n.user_login = u.username
+				on n.username = u.username
 					WHERE u.username =:username";
 
 			$stmt = $this->conn->prepare($query);
@@ -59,7 +64,7 @@
 		function delete() {
 		
 			$query = "DELETE
-			FROM notes 
+			FROM " . $this->table_name . "
 			WHERE note_id =:note_id
 			LIMIT 1";
 
@@ -77,6 +82,34 @@
 				echo json_encode(array("status" => "not ok"));
 			}
 		
+		}
+
+
+		function create() {
+
+			$query = "INSERT INTO
+			" . $this->table_name . "
+				(username, title, content, color, created_at)
+			VALUES
+				(:username, :title, :content, :color, :created_at)";
+
+			$stmt = $this->conn->prepare($query);
+
+			$stmt->bindParam(':username', $this->username);
+			$stmt->bindParam(':title', $this->title);
+			$stmt->bindParam(':content', $this->content);
+			$stmt->bindParam(':color', $this->color);
+			$stmt->bindParam(':created_at', date("Y-n-j"));
+
+			$res = $stmt->execute();
+
+			if ($res) {
+				http_response_code(200);
+				echo json_encode(array("status"=>"ok"));
+			} else {
+				http_response_code(400);
+				echo json_encode(array("status"=>"no", "error" => $res->errorInfo()));
+			}
 		}
 
 		
